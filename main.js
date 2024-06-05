@@ -26,9 +26,58 @@ const batch = [valid1, valid2, valid3, valid4, valid5, invalid1, invalid2, inval
 // Add your functions below:
 
 
+const validateCred = (input) => {
+    card = input.slice(0).reverse();
+    for (let i = 1; i < card.length; i+=2) {
+        card[i] = card[i] * 2;
+        if (card[i] > 9) card[i] = card[i] - 9;
+    }
+    if (card.reduce((accumulator, currentValue) => accumulator + currentValue) % 10 === 0) return true;
+    return false;
+}
 
+const findInvalidCards = (lista) => {
+    return lista.map((element) => {if(!validateCred(element)) return element}).filter(element => element);
+}
 
+function idInvalidCardCompanies(lista) {
+    let company = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+    lista.forEach(element => {company[element[0]]++});
+    let companyName = [];
+    if (company[3] > 0) companyName.push('Amex (American Express)');
+    if (company[4] > 0) companyName.push('Visa');
+    if (company[5] > 0) companyName.push('Mastercard');
+    if (company[6] > 0) companyName.push('Discover');
+    if ((company[0] + company[1] + company[2] + company[7] + company[8] + company[9]) > 0) companyName.push('Company not found');
+    return companyName;
+}
 
+const numToArray = (num) => {
+    let tarjeta = [];
+    while (num > 0) {
+        tarjeta.unshift(num % 10);
+        num = (num - (num % 10)) / 10;
+    }
+    return tarjeta;
+}
 
+const cadenaToArray = (cadena) => {
+    return numToArray(+cadena);
+}
 
+const toValid = (input) => {
+    card = input.slice(0).reverse();
+    for (let i = 1; i < card.length; i+=2) {
+        card[i] = card[i] * 2;
+        if (card[i] > 9) card[i] = card[i] - 9;
+    }
+    let checksum = 10 - ((card.reduce((accumulator, currentValue) => accumulator + currentValue) - card[0]) % 10)
+    let valid = input.slice(0);
+    valid[valid.length -1] = checksum;
+    return valid;
+}
+
+console.log(idInvalidCardCompanies(findInvalidCards(batch)));
+
+console.log(toValid([4, 5, 3, 9, 6, 7, 7, 9, 0, 8, 0, 1, 6, 8, 0, 0]));
 
