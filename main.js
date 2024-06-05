@@ -27,23 +27,29 @@ const batch = [valid1, valid2, valid3, valid4, valid5, invalid1, invalid2, inval
 
 
 const validateCred = (input) => {
+    // We copy the card number to a local array and reverse it so it is easy to manipulate
     card = input.slice(0).reverse();
+    // Doubling the value of every other digit starting on the second (pos 1 on array). Substracted 9 if it is over 9.
     for (let i = 1; i < card.length; i+=2) {
         card[i] = card[i] * 2;
         if (card[i] > 9) card[i] = card[i] - 9;
     }
+    // We add all the values and find modulo, if it is 0 card is valid
     if (card.reduce((accumulator, currentValue) => accumulator + currentValue) % 10 === 0) return true;
     return false;
 }
 
 const findInvalidCards = (lista) => {
-    return lista.map((element) => {if(!validateCred(element)) return element}).filter(element => element);
+    // The batch of cards is checked with vlidateCred(), if is valid the card is mapped for return, if it is not false is mapped. Then the falses are filtered.
+    return lista.map((element) => {if(!validateCred(element)) {return element} else {return false}}).filter(element => element);
 }
 
 function idInvalidCardCompanies(lista) {
     let company = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+    // First digit of every card is used as index of company array
     lista.forEach(element => {company[element[0]]++});
     let companyName = [];
+    // If an index on the array is more than 0 that means that at least one card from that company was found, then the name is added to an array.
     if (company[3] > 0) companyName.push('Amex (American Express)');
     if (company[4] > 0) companyName.push('Visa');
     if (company[5] > 0) companyName.push('Mastercard');
@@ -52,30 +58,41 @@ function idInvalidCardCompanies(lista) {
     return companyName;
 }
 
+// To convert a number to an array (one number one item)
 const numToArray = (num) => {
+    // The array to store the card number
     let tarjeta = [];
+    // While there are still numbers we extract the last number (resto after dividing by 10) and add to the start of the array
     while (num > 0) {
         tarjeta.unshift(num % 10);
+        // Delete the last number.
         num = (num - (num % 10)) / 10;
     }
     return tarjeta;
 }
 
 const cadenaToArray = (cadena) => {
+    // If we have the card as string, first convert it to number and then call numToArray. Does not work with one or more 0 on the begining
     return numToArray(+cadena);
 }
 
+// Receives a card number (valid or invalid), returns a valid number corrected (changed last number if needed)
 const toValid = (input) => {
+    // Temporal array to make some math on it, reversed
     card = input.slice(0).reverse();
+    // Double every other value. Substracted 9 if it is over 9
     for (let i = 1; i < card.length; i+=2) {
         card[i] = card[i] * 2;
         if (card[i] > 9) card[i] = card[i] - 9;
     }
+    // checksum is what the last value should be
     let checksum = 10 - ((card.reduce((accumulator, currentValue) => accumulator + currentValue) - card[0]) % 10)
     let valid = input.slice(0);
     valid[valid.length -1] = checksum;
     return valid;
 }
+
+console.log(findInvalidCards(batch));
 
 console.log(idInvalidCardCompanies(findInvalidCards(batch)));
 
